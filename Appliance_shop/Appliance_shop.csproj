@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DB\Appliance.cs" />
     <Compile Include="DB\ApplianceRepository.cs" />
     <Compile Include="DB\DB.cs" />
     <Compile Include="DB\DBUtils.cs" />
@@ -57,11 +58,29 @@
     <Compile Include="DB\ShopingListRepository.cs" />
     <Compile Include="DB\User.cs" />
     <Compile Include="DB\UserRepository.cs" />
-    <Compile Include="UI\Appliances.cs">
+    <Compile Include="UI\AddApplinceAmount.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\Appliances.Designer.cs">
-      <DependentUpon>Appliances.cs</DependentUpon>
+    <Compile Include="UI\AddApplinceAmount.Designer.cs">
+      <DependentUpon>AddApplinceAmount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\AddCategory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\AddCategory.Designer.cs">
+      <DependentUpon>AddCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\FinanciaInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FinanciaInfo.Designer.cs">
+      <DependentUpon>FinanciaInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MainTab.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MainTab.Designer.cs">
+      <DependentUpon>MainTab.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,11 +90,35 @@
     <Compile Include="UI\ChangeProfile.Designer.cs">
       <DependentUpon>ChangeProfile.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ForgotPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\ForgotPassword.Designer.cs">
+      <DependentUpon>ForgotPassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GetCard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\GetCard.Designer.cs">
+      <DependentUpon>GetCard.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Log in.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\Log in.Designer.cs">
       <DependentUpon>Log in.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ChangeUserRole.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\ChangeUserRole.Designer.cs">
+      <DependentUpon>ChangeUserRole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\AddTrademark.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\AddTrademark.Designer.cs">
+      <DependentUpon>AddTrademark.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\Registration.cs">
       <SubType>Form</SubType>
@@ -83,8 +126,27 @@
     <Compile Include="UI\Registration.Designer.cs">
       <DependentUpon>Registration.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="UI\Appliances.resx">
-      <DependentUpon>Appliances.cs</DependentUpon>
+    <Compile Include="UI\SupplyOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\SupplyOrder.Designer.cs">
+      <DependentUpon>SupplyOrder.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="UI\AddApplinceAmount.resx">
+      <DependentUpon>AddApplinceAmount.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\AddCategory.resx">
+      <DependentUpon>AddCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\AddTrademark.resx">
+      <DependentUpon>AddTrademark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FinanciaInfo.resx">
+      <DependentUpon>FinanciaInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\MainTab.resx">
+      <DependentUpon>MainTab.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -98,11 +160,23 @@
     <EmbeddedResource Include="UI\ChangeProfile.resx">
       <DependentUpon>ChangeProfile.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\ForgotPassword.resx">
+      <DependentUpon>ForgotPassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\GetCard.resx">
+      <DependentUpon>GetCard.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Log in.resx">
       <DependentUpon>Log in.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\ChangeUserRole.resx">
+      <DependentUpon>ChangeUserRole.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Registration.resx">
       <DependentUpon>Registration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SupplyOrder.resx">
+      <DependentUpon>SupplyOrder.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

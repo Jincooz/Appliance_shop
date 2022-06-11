@@ -88,24 +88,28 @@ namespace WindowsFormsApp1.DB
         }
         public List<object> FormTableRow()
         {
-            List<object> result = new List<object>();
-            result.Add(Login);
-            result.Add(Email);
-            result.Add(PhoneNumber);
-            result.Add(CreationDateTime.ToString());
-            result.Add(LastLogIn.ToString());
-            result.Add(Enabled ? RoleName : "Banned");
+            List<object> result = new List<object>
+            {
+                Login,
+                Email,
+                PhoneNumber,
+                CreationDateTime.ToString(),
+                LastLogIn.ToString(),
+                Enabled ? RoleName : "Banned"
+            };
             return result;
         }
         public static List<object> FormTableColumnsName()
         {
-            List<object> result = new List<object>();
-            result.Add("Login");
-            result.Add("Email");
-            result.Add("Phone Number");
-            result.Add("Creation moment");
-            result.Add("Last seen online");
-            result.Add("Role");
+            List<object> result = new List<object>
+            {
+                "Login",
+                "Email",
+                "Phone Number",
+                "Creation moment",
+                "Last seen online",
+                "Role"
+            };
             return result;
         }
         public static string RealName(string name)
@@ -155,7 +159,7 @@ namespace WindowsFormsApp1.DB
         }
         private string FormSql(string variables)
         {
-            string sql = "SELECT " + variables + " FROM users_list WHERE login = \"" + Login + "\"";
+            string sql = "SELECT " + variables + " FROM users WHERE login = \"" + Login + "\"";
             return sql;
         }
         private void LoadAllByLogin()
@@ -183,8 +187,7 @@ namespace WindowsFormsApp1.DB
         }
         private void UpdateLastSeen(int id)
         {
-            string sql = $"CALL UPDATE_LAST_SEEN({id})";
-            DB.Instance.Procedure(sql);
+            DB.Instance.UpdateLastSeen(id);
         }
         public void Register(string login, string email, string phoneNumber, string roleName,
                        DateTime dateTime, string password)
@@ -202,25 +205,55 @@ namespace WindowsFormsApp1.DB
             Array.Copy(salt, 0, hashBytes, 0, 16);
             Array.Copy(hash, 0, hashBytes, 16, 20);
             HashedPassword = Convert.ToBase64String(hashBytes);
-            string sql = $"CALL ADD_USER('{Login}','{Email}','{HashedPassword}','{PhoneNumber}','{RoleName}');";
-            DB.Instance.Procedure(sql);
+            DB.Instance.AddUser(login:Login,
+                                email:Email,
+                                phoneNumber:PhoneNumber,
+                                roleName:RoleName,
+                                hashedPassword:HashedPassword);
             LoadByLogin("id");
             ShopingList = new ShopingListRepository();
+            try
+            {
+                ShopingList.Load("");
+            }
+            catch (Exception e)
+            {
+                var a = e.Message;
+            }
         }
         public void LogIn(string login, string password)
         {
             Login = login;
             LoadAllByLogin();
+            if (!Enabled)
+                throw new Exception("You are banned");
             CheckPassword(password);
             UpdateLastSeen(Id);
+            ShopingList = new ShopingListRepository();
+            ShopingList.Load("");
         }
         public void UpdateUser(string login, string email, string phoneNumber)
         {
-            string sql = $"CALL UPDATE_USER_DATA('{Id}','{login}','{email}','{phoneNumber}');";
-            DB.Instance.Procedure(sql);
+            DB.Instance.UpdateUserData(Id, login, email, phoneNumber);
             Login = login;
             Email = email;
             PhoneNumber = phoneNumber;
+        }
+        public void RestorePassword(string login, string email, string phoneNumber, string password)
+        {
+            Login = login;
+            LoadAllByLogin();
+            if (Email != email || PhoneNumber != phoneNumber)
+                throw new Exception();
+            byte[] salt;
+            new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
+            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
+            byte[] hash = pbkdf2.GetBytes(20);
+            byte[] hashBytes = new byte[36];
+            Array.Copy(salt, 0, hashBytes, 0, 16);
+            Array.Copy(hash, 0, hashBytes, 16, 20);
+            HashedPassword = Convert.ToBase64String(hashBytes);
+            DB.Instance.UpdatePassword(Id, HashedPassword);
         }
     }
 }

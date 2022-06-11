@@ -6,29 +6,22 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1.DB
 {
-    class ShopingListRepository : Repository
+    class ShopingListRepository : IRepository
     {
         private List<ApplianceAmount> _appliances;
         internal List<ApplianceAmount> Appliances { get => _appliances; set => _appliances = value; }
-        private string FormSql()
-        {
-            string sql = "SELECT user_id, appliance_EAN, amount FROM shoping_list WHERE user_id = \"" + ActiveUser.Instance.ID + "\"";
-            return sql;
-        }
+        public int Size { get => _appliances.Count; }
         public void Load(string aditionalRequest, string orderBy = "", int page = 0)
         {
             Appliances = new List<ApplianceAmount>();
-            int amount = DB.Instance.GetAmountOfRequests("shoping_list WHERE user_id = \"" + ActiveUser.Instance.ID + "\"");
-            for (int i = 0; i < amount; i++)
-            {
-                Appliances.Add(new ApplianceAmount(new Appliance(),0));
-            }
-            var data = DB.Instance.Select(FormSql());
+            var data = DB.Instance.SelectShopingList("appliance_EAN AS EAN, amount");
             foreach (var keyValuesPair in data)
             {
                 (string key, object value) keyValuePair;
                 for (int i = 0; i < keyValuesPair.Value.Count; i++)
                 {
+                    if (i == Appliances.Count)
+                        Appliances.Add(new ApplianceAmount(new Appliance(), 0));
                     keyValuePair = (keyValuesPair.Key, keyValuesPair.Value[i]);
                     switch ((string)keyValuePair.key)
                     {
@@ -43,21 +36,95 @@ namespace WindowsFormsApp1.DB
                                 int amountOfAppliances = Convert.ToInt32(keyValuePair.value);
                                 var AppliaRef = Appliances[i]; 
                                 AppliaRef.amount = amountOfAppliances;
+                                Appliances[i] = AppliaRef;
                                 break;
                             }
                     }
                 }
             }
         }
+        private List<object> FormTableColumnsName()
+        {
+            List<object> result = new List<object>
+            {
+                "EAN",
+                "Title",
+                "Guaranty Time",
+                "Price in UAH",
+                "Amount"
+            };
+            return result;
+        }
+        private List<object> FormTableRow(ApplianceAmount applianceAmount)
+        {
+            List<object> result = new List<object>
+            {
+                applianceAmount.appliance.EAN,
+                applianceAmount.appliance.Title,
+                applianceAmount.appliance.GuarantyTime,
+                applianceAmount.appliance.Price,
+                applianceAmount.amount
+            };
+            return result;
+        }
         public List<List<object>> FormTable()
         {
-            List<List<object>> result = new List<List<object>>();
-            result.Add(Appliance.FormTableColumnsName());
+            List<List<object>> result = new List<List<object>>
+            {
+                FormTableColumnsName()
+            };
             foreach (var ApplianceAmount in Appliances)
             {
-                result.Add(ApplianceAmount.appliance.FormTableRow());
+                result.Add(FormTableRow(ApplianceAmount));
             }
             return result;
+        }
+        public void Do(int row)
+        {
+            UI.AddApplinceAmount applinceAmount = new UI.AddApplinceAmount();
+            applinceAmount.ShowDialog();
+            if (applinceAmount.Approved)
+            {
+                int maxAmount = Convert.ToInt32(DB.Instance.SelectAvaliableDevice(" amount ", Appliances[row].appliance.EAN)["amount"][0]);
+                if(applinceAmount.Amount > maxAmount)
+                {
+                    applinceAmount.Amount = maxAmount;
+                }
+                var AppliaRef = Appliances[row];
+                AppliaRef.amount = applinceAmount.Amount;
+                Appliances[row] = AppliaRef;
+                if (Appliances[row].amount == 0)
+                {
+                    DB.Instance.DeleteApplianceAmount(Appliances[row].appliance.EAN);
+                    Appliances.RemoveAt(row);
+                }
+                else
+                    DB.Instance.UpdateApplianceAmount(Appliances[row].appliance.EAN, applinceAmount.Amount);
+            }
+        }
+        public void Do(Appliance new_appliance)
+        {
+            foreach (var applianceAmount in Appliances)
+            {
+                if (applianceAmount.appliance.EAN == new_appliance.EAN)
+                    throw new Exception("Already in list");
+            }
+            DB.Instance.CreateApplianceAmount(new_appliance.EAN, 1);
+            Appliances.Add(new ApplianceAmount(new_appliance, 1));
+        }
+        public int GetSize(string aditionalRequest)
+        {            
+            var data = DB.Instance.SelectShopingList(" count(*) AS size ");
+            return Convert.ToInt32(data["size"][0]);
+        }
+        public void Do2()
+        {
+            double sum = 0;
+            foreach(var appliaceAmount in Appliances)
+            {
+                sum += appliaceAmount.amount * appliaceAmount.appliance.Price;
+            }
+            DB.Instance.BuyTransaction(ActiveUser.Instance.ID, Math.Round(sum,2));
         }
     }
 }

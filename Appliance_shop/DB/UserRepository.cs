@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1.DB
 {
-    public class UserRepository : Repository
+    public class UserRepository : IRepository
     {
         private List<User> _users;
         public UserRepository()
@@ -51,6 +51,39 @@ namespace WindowsFormsApp1.DB
                 result.Add(user.FormTableRow());
             }
             return result;
+        }
+        public void Do(int row)
+        {
+            if(!Users[row].Enabled)
+            {
+                DB.Instance.EnableUser(Users[row].Id);
+                return;
+            }
+            UI.ChangeUserRole messageBox = new UI.ChangeUserRole();
+            messageBox.RoleName = Users[row].RoleName;
+            messageBox.ShowDialog();
+            if (messageBox.RoleChanged)
+            {
+                if (messageBox.RoleName == "Banned")
+                    DB.Instance.DisableUser(Users[row].Id);
+                else
+                {
+                    var newRole = messageBox.RoleName;
+                    DB.Instance.UpdateUserRole(Users[row].Id, newRole);
+                    Users[row].RoleName = newRole;
+                }
+            }
+        }
+        public int GetSize(string aditionalRequest)
+        {
+            string sql = "SELECT count(*) AS size FROM users";
+            if (aditionalRequest != "") sql += aditionalRequest;
+            var data = DB.Instance.Select(sql);
+            return Convert.ToInt32(data["size"][0]);
+        }
+        public void Do2()
+        {
+            throw new NotImplementedException();
         }
     }
 }

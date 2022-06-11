@@ -11,15 +11,17 @@ namespace WindowsFormsApp1
     {
         private List<string> _columnsNames;
         private List<List<Object>> _data;
-        private List<Filter> _filters;
-        private DB.Repository _repository;
+        private readonly List<Filter> _filters;
+        private DB.IRepository _repository;
         private string _orderBy;
+        private int _size;
         public List<List<Object>> Data { get => _data; set => _data = value; }
         public List<string> ColumnsNames { get => _columnsNames; set => _columnsNames = value; }
         internal List<Filter> Filters { get => _filters; }
         public string OrderBy { private get => _orderBy; set => _orderBy = value; }
         public int Count { get => _data.Count; }
-        internal Repository Repository { get => _repository; set => _repository = value; }
+        internal IRepository Repository { get => _repository; set => _repository = value; }
+        public int Size { get => _size; private set => _size = value; }
         public Table()
         {
             _columnsNames = new List<string>();
@@ -72,8 +74,9 @@ namespace WindowsFormsApp1
                 result.Add((string)element);
             Filters.Add(new CountableFilter(name, result));
         }
-        virtual public void GetDataFromRepository(int page) 
+        public void GetDataFromRepository(int page) 
         {
+            Size = (int)Math.Ceiling(1d * Repository.GetSize(FormRequest()) / ActiveUser.Instance.RowsOnPage);
             Repository.Load(FormRequest(), OrderBy, page);
             SetDataInTable(Repository.FormTable());
         }
@@ -95,7 +98,6 @@ namespace WindowsFormsApp1
             AddCountableFilter(DB.DB.Instance.GetEnumerableTrademark());
         }
     }
-
     public class UserTable : Table
     {
         public UserTable() : base()

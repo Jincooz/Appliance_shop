@@ -25,11 +25,21 @@ namespace WindowsFormsApp1.UI
                 ActiveUser.Instance.User = user;
                 this.Close();
             }
-            catch
+            catch (Exception exept)
             {
-                MessageBox.Show("Invalid login or password", "Error",
+                if(exept.Message == "You are banned")
+                    MessageBox.Show("You are banned", "Error",
+                         MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else
+                    MessageBox.Show("Invalid login or password", "Error",
                          MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            UI.ForgotPassword forgotPassword = new ForgotPassword();
+            forgotPassword.ShowDialog();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace WindowsFormsApp1.DB
     class DB
     {
         private static DB _instance;
-        private MySqlConnection connection;
+        private readonly MySqlConnection connection;
         public static DB Instance { get
             {
                 if (_instance == null)
@@ -24,19 +24,102 @@ namespace WindowsFormsApp1.DB
         {
             connection = DBUtils.GetDBConnection();
         }
-        //public List<List<Object>> GetShopingList(string request)
-        //{
-        //    string sql = "SELECT * FROM shoping_list" 
-        //        + " WHERE user_id = " + ActiveUser.Instance.ID;
-        //    if (request != "") sql += " WHERE " + request + ";";
-        //    return Select(sql);
-        ////}
-        //public List<List<Object>> GetAppliance(string request)
-        //{
-        //    string sql = "SELECT * FROM avaliable_devices";
-        //    if (request != "") sql += " WHERE " + request + ";";
-        //    return Select(sql);
-        //}
+        public Dictionary<string, List<Object>> Select(string statement)
+        {
+            Dictionary<string,List<Object>> result = new Dictionary<string, List<Object>>();
+            connection.Open();
+            MySqlCommand cmd = new MySqlCommand
+            {
+                Connection = connection,
+                CommandText = statement
+            };
+            try
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            if (result.Count == 0)
+                            {
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    result.Add(reader.GetName(i), new List<object>());
+                                }
+                            }
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                result[reader.GetName(i)].Add(reader.GetValue(i));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            result.Add(reader.GetName(i), new List<object>());
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return result;
+        }
+        private bool IsInDB(string statement)
+        {
+            connection.Open();
+            MySqlCommand cmd = new MySqlCommand
+            {
+                Connection = connection,
+                CommandText = statement
+            };
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    connection.Close();
+                    return true;
+                }
+                else
+                {
+                    connection.Close();
+                    return false;
+                }
+            }
+        }
+        private void Procedure(string statement)
+        {
+            connection.Open();
+            MySqlCommand cmd = new MySqlCommand
+            {
+                Connection = connection,
+                CommandText = statement
+            };
+            //cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                if (e.Message.Contains("Duplicate entry"))
+                    throw new Exception(e.Message.Substring(e.Message.IndexOf("uc_") + 3));
+                else
+                    throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
         public (string, List<object>) GetEnumerableTrademark()
         {
             string sql = "SELECT name FROM TRADEMARK";
@@ -55,70 +138,151 @@ namespace WindowsFormsApp1.DB
             var result = Select(sql);
             return ("Category", result["name"]);
         }
-        public Dictionary<string, List<Object>> Select(string statement)
+        public (string, List<object>) GetEnumerableAccounts()
         {
-            Dictionary<string,List<Object>> result = new Dictionary<string, List<Object>>();
-            connection.Open();
-            MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = connection;
-            cmd.CommandText = statement;
-            using (var reader = cmd.ExecuteReader())
-            {
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        if (result.Count == 0)
-                        {
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                result.Add(reader.GetName(i),new List<object>());
-                            }
-                        }
-                        for (int i = 0; i < reader.FieldCount; i++)
-                        {
-                            result[reader.GetName(i)].Add(reader.GetValue(i));
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        result.Add(reader.GetName(i), new List<object>());
-                    }
-                }
-            }
-            connection.Close();
-            return result;
+            string sql = "SELECT id FROM CHART_OF_ACCOUNTS";
+            var result = Select(sql);
+            return ("Account", result["name"]);
         }
-        public void Procedure(string statement)
+        public Dictionary<string, List<Object>> SelectShopingList(string selectingItems)
         {
-            connection.Open();
-            MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = connection;
-            cmd.CommandText = statement;
-            //cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                if (e.Message.Contains("Duplicate entry"))
-                    throw new Exception(e.Message.Substring(e.Message.IndexOf("uc_") + 3));
-            }
-            finally
-            {
-                connection.Close();
-            }
+            string sql = $"SELECT {selectingItems} FROM shoping_list WHERE user_id = \"" + ActiveUser.Instance.ID + "\"";
+            return DB.Instance.Select(sql);
         }
-
+        public Dictionary<string, List<Object>> SelectAvaliableDevices(string selectingItems, string aditionalRequest)
+        {
+            string sql = $"SELECT {selectingItems} FROM avaliable_devices_full " + aditionalRequest;
+            return DB.Instance.Select(sql);
+        }
+        public Dictionary<string, List<Object>> SelectAvaliableDevice(string selectingItems, string EAN)
+        {
+            string sql = $"SELECT {selectingItems} FROM avaliable_devices WHERE EAN = {EAN}";
+            return DB.Instance.Select(sql);
+        }
+        public bool TrademarkIsInDB(string trademark)
+        {
+            string sql = $"SELECT name FROM TRADEMARK WHERE name = '{trademark}'";
+            return IsInDB(sql);
+        }
+        public bool CategoryIsInDB(string category)
+        {
+            string sql = $"SELECT name FROM TRADEMARK WHERE name = '{category}'";
+            return IsInDB(sql);
+        }
+        public bool EANIsInDB(string EAN)
+        {
+            string sql = $"SELECT name FROM TRADEMARK WHERE EAN = '{EAN}'";
+            return IsInDB(sql);
+        }
+        public void UpdateLastSeen(int id)
+        {
+            string sql = $"CALL UPDATE_LAST_SEEN({id})";
+            DB.Instance.Procedure(sql);
+        }
+        public void AddUser(string login, string email, string phoneNumber, string roleName, string hashedPassword)
+        {
+            string sql = $"CALL ADD_USER('{login}','{email}','{hashedPassword}','{phoneNumber}','{roleName}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void UpdateUserData(int id, string login, string email, string phoneNumber)
+        {
+            string sql = $"CALL UPDATE_USER_DATA('{id}','{login}','{email}','{phoneNumber}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void UpdateUserRole(int id, string role_name)
+        {
+            string sql = $"CALL UPDATE_USER_ROLE('{id}','{role_name}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void EnableUser(int id)
+        {
+            string sql = $"CALL ENABLE_USER({id})";
+            DB.Instance.Procedure(sql);
+        }
+        public void DisableUser(int id)
+        {
+            string sql = $"CALL DISSABLE_USER({id})";
+            DB.Instance.Procedure(sql);
+        }
+        public void UpdatePassword(int id, string newHashedPassword)
+        {
+            string sql = $"CALL UPDATE_PASSWORD('{newHashedPassword}','{id}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void AddAppliacne(string EAN, string name, double price, string categoryName, string trademarkName, int guarantyDays)
+        {
+            string sql = $"CALL ADD_APPLIANCE('{EAN}','{name}','{price}','{categoryName}','{trademarkName}','{guarantyDays}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void AddCategory(string name)
+        {
+            string sql = $"CALL ADD_APPLIANCE_CATEGORY('{name}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void AddTrademark(string name)
+        {
+            string sql = $"CALL ADD_TRADEMARK('{name}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void AddUserOrder(int user_id)
+        {
+            string sql = $"CALL ADD_USER_ORDER('{user_id}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void AddSupplyOrder(int user_id)
+        {
+            string sql = $"CALL ADD_SUPPLY_ORDER('{user_id}');";
+            DB.Instance.Procedure(sql);
+        }
+        private bool OrderForUserDontExist(int user_id)
+        {
+            string sql = $"SELECT COUNT(*) AS amount FROM ORDERS o WHERE o.user_id = {user_id} AND o.Active = 1";
+            var res = Select(sql);
+            return Convert.ToInt32(res["amount"][0]) == 0;
+        }
+        public void CreateApplianceAmount(string EAN, int amount)
+        {
+            if (OrderForUserDontExist(ActiveUser.Instance.ID))
+                AddUserOrder(ActiveUser.Instance.ID);
+            string sql = $"CALL ADD_ORDER_ITEM('{EAN}','{ActiveUser.Instance.ID}','{amount}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void UpdateApplianceAmount(string EAN, int amount)
+        {
+            string sql = $"CALL UPDATE_ORDER_ITEM('{EAN}','{ActiveUser.Instance.ID}','{amount}');";
+            DB.Instance.Procedure(sql);
+        }
+        public void DeleteApplianceAmount(string EAN)
+        {
+            string sql = $"CALL DELETE_ORDER_ITEM('{EAN}','{ActiveUser.Instance.ID}');";
+            DB.Instance.Procedure(sql);
+        }
         public int GetAmountOfRequests(string name)
         {
             string sql = "SELECT count(*) AS amount FROM " + name;
             var result = Select(sql);
             return Convert.ToInt32(result["amount"][0]);
+        }
+        public void BuyTransaction(int user_id, double sum)
+        {
+            string sql =    $"START TRANSACTION;" +
+                            $"CALL ADD_TRANSACTION('361','702','User buy applianse','{user_id}','{sum}');" +
+                            $"CALL ADD_TRANSACTION('311','361','User pay out','{user_id}','{sum}');" +
+                            $"CALL ADD_TRANSACTION('902','281','Write off appliances from the warehouse','{user_id}','{sum*0.8}');" +
+                            $"CALL ADD_TRANSACTION('702','791','Write-off of income on the financial result','{user_id}','{sum}');" +
+                            $"CALL ADD_TRANSACTION('791','902','Write-off of value for financial result','{user_id}','{sum*0.8}');" +
+                            $"CALL CLOSE_USER_ORDER('{user_id}');" +
+                            $"COMMIT;\n";
+            DB.Instance.Procedure(sql);
+        }
+        public void SupplyTransaction(int user_id, double sum)
+        {
+            string sql = $"START TRANSACTION;" +
+                            $"CALL ADD_TRANSACTION('281','631','Shop buy applianse','{user_id}','{sum*0.8}');" +
+                            $"CALL ADD_TRANSACTION('631','311','Shop pay out','{user_id}','{sum*0.8}');" +
+                            $"CALL CLOSE_SUPPLY_ORDER('{user_id}');" +
+                            $"COMMIT;";
+            DB.Instance.Procedure(sql);
         }
     }
 }
