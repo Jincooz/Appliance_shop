@@ -105,7 +105,7 @@ namespace WindowsFormsApp1.UI
             this.EANMaskedTextBox.Name = "EANMaskedTextBox";
             this.EANMaskedTextBox.Size = new System.Drawing.Size(136, 22);
             this.EANMaskedTextBox.TabIndex = 11;
-            this.EANMaskedTextBox.TextMaskFormat = System.Windows.Forms.MaskFormat.ExcludePromptAndLiterals;
+            this.EANMaskedTextBox.TextMaskFormat = System.Windows.Forms.MaskFormat.IncludePrompt;
             // 
             // EANLabel
             // 

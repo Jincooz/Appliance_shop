@@ -79,7 +79,7 @@ namespace WindowsFormsApp1.DB
             }
             return result;
         }
-        public void Do(int row)
+        public void TableRowClicked(int row)
         {
             UI.AddApplinceAmount applinceAmount = new UI.AddApplinceAmount();
             applinceAmount.ShowDialog();
@@ -117,7 +117,7 @@ namespace WindowsFormsApp1.DB
             var data = DB.Instance.SelectShopingList(" count(*) AS size ");
             return Convert.ToInt32(data["size"][0]);
         }
-        public void Do2()
+        public void ActionButtonClick()
         {
             double sum = 0;
             foreach(var appliaceAmount in Appliances)

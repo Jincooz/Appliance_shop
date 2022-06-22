@@ -20,6 +20,7 @@ namespace WindowsFormsApp1.DB
         private DateTime _lastLogIn;
         private string _roleName;
         private ShopingListRepository _shopingList;
+        private Rights _rights;
         public int Id { get => _id; set => _id = value; }
         public string Login { get => _login; set => _login = value; }
         public string Email { get => _email; set => _email = value; }
@@ -30,6 +31,7 @@ namespace WindowsFormsApp1.DB
         public string RoleName { get => _roleName; set => _roleName = value; }
         public DateTime LastLogIn { get => _lastLogIn; set => _lastLogIn = value; }
         public ShopingListRepository ShopingList { get => _shopingList; set => _shopingList = value; }
+        public Rights Rights { get => _rights; set => _rights = value; }
         public void Add((string name, object value) nameValuePair)
         {
             switch (nameValuePair.name)
@@ -220,6 +222,7 @@ namespace WindowsFormsApp1.DB
             {
                 var a = e.Message;
             }
+            Rights = new Rights(RoleName);
         }
         public void LogIn(string login, string password)
         {
@@ -231,6 +234,7 @@ namespace WindowsFormsApp1.DB
             UpdateLastSeen(Id);
             ShopingList = new ShopingListRepository();
             ShopingList.Load("");
+            Rights = new Rights(RoleName);
         }
         public void UpdateUser(string login, string email, string phoneNumber)
         {

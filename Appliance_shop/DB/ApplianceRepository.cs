@@ -105,7 +105,7 @@ namespace WindowsFormsApp1.DB
             }
             return result;
         }
-        public void Do(int row)
+        public void TableRowClicked(int row)
         {
             DialogResult result = MessageBox.Show(
                 "You want add this one to your cart?",
@@ -128,7 +128,7 @@ namespace WindowsFormsApp1.DB
             var data = DB.Instance.SelectAvaliableDevices(" COUNT(*) AS size ",sql);
             return Convert.ToInt32(data["size"][0]);
         }
-        public void Do2()
+        public void ActionButtonClick()
         {
             throw new NotImplementedException();
         }

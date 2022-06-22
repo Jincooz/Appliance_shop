@@ -118,7 +118,7 @@ namespace WindowsFormsApp1.UI
         }
         private void AddButton_Click(object sender, EventArgs e)
         {
-            CheckInput();
+            if (!CheckInput()) return;
             if (New) 
             {
                 var trademarks = DB.DB.Instance.GetEnumerableTrademark();
@@ -167,6 +167,14 @@ namespace WindowsFormsApp1.UI
                     DB.DB.Instance.AddAppliacne(appliance.EAN, appliance.Title, appliance.Price, appliance.Category, appliance.Trademark, appliance.GuarantyTime);
                     HideAddNew();
                     Data.Appliances.Add(new DB.ApplianceAmount(appliance, Convert.ToInt32(AmountTextBox.Text)));
+                    EANMaskedTextBox.ReadOnly = false;
+                    EANMaskedTextBox.Text = "";
+                    AmountTextBox.Text = "";
+                    CategoryTextBox.Text = "";
+                    GuarantyTextBox.Text = "";
+                    PriceTextBox.Text = "";
+                    TitleTextBox.Text = "";
+                    TrademarkTextBox.Text = "";
                 }
                 catch (Exception excep)
                 {
@@ -198,6 +206,8 @@ namespace WindowsFormsApp1.UI
                 {
                     appliance.LoadByEAN();
                     Data.Appliances.Add(new DB.ApplianceAmount(appliance, Convert.ToInt32(AmountTextBox.Text)));
+                    EANMaskedTextBox.Text = "";
+                    AmountTextBox.Text = "";
                 }
                 catch (Exception excep)
                 {
@@ -209,6 +219,7 @@ namespace WindowsFormsApp1.UI
                                                     MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
+                        EANMaskedTextBox.ReadOnly = true;
                         ShowAddNew();
                     }
                 }

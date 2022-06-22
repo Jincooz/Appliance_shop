@@ -55,6 +55,7 @@
     <Compile Include="Application\Table.cs" />
     <Compile Include="Application\ActiveUser.cs" />
     <Compile Include="DB\Repository.cs" />
+    <Compile Include="DB\Rights.cs" />
     <Compile Include="DB\ShopingListRepository.cs" />
     <Compile Include="DB\User.cs" />
     <Compile Include="DB\UserRepository.cs" />

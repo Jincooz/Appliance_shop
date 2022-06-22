@@ -121,8 +121,7 @@ namespace WindowsFormsApp1
         private void InitializeByRole()
         {
             menuStrip.Items.Clear();
-            Rights rights = ActiveUser.Instance.Rights;
-            if(rights.ShowAdminToolStripMenuItem)
+            if(ActiveUser.Instance.Rights.ShowAdminToolStripMenuItem)
             {
                 ToolStripMenuItem adminToolStripMenuItem = new ToolStripMenuItem
                 {
@@ -131,7 +130,7 @@ namespace WindowsFormsApp1
                     Text = "Admin"
                 };
                 menuStrip.Items.Add(adminToolStripMenuItem);
-                if (rights.ShowGetFinancialInfoToolStripMenuItem)
+                if (ActiveUser.Instance.Rights.ShowGetFinancialInfoToolStripMenuItem)
                 {
                     ToolStripMenuItem getFinancialInfoToolStripMenuItem = new ToolStripMenuItem
                     {
@@ -142,7 +141,7 @@ namespace WindowsFormsApp1
                     getFinancialInfoToolStripMenuItem.Click += new System.EventHandler(this.GetFinancialInfoToolStripMenuItem_Click);
                     adminToolStripMenuItem.DropDownItems.Add(getFinancialInfoToolStripMenuItem);
                 }
-                if(rights.ShowSeeUserListToolStripMenuItem)
+                if(ActiveUser.Instance.Rights.ShowSeeUserListToolStripMenuItem)
                 {
                     ToolStripMenuItem seeUserListToolStripMenuItem = new ToolStripMenuItem
                     {
@@ -153,7 +152,7 @@ namespace WindowsFormsApp1
                     seeUserListToolStripMenuItem.Click += new System.EventHandler(this.SeeUserListToolStripMenuItem_Click);
                     adminToolStripMenuItem.DropDownItems.Add(seeUserListToolStripMenuItem);
                 }
-                if(rights.ShowAddSuplyToolStripMenuItem)
+                if(ActiveUser.Instance.Rights.ShowAddSuplyToolStripMenuItem)
                 {
                     ToolStripMenuItem addSuplyToolStripMenuItem = new ToolStripMenuItem
                     {
@@ -165,7 +164,7 @@ namespace WindowsFormsApp1
                     adminToolStripMenuItem.DropDownItems.Add(addSuplyToolStripMenuItem);
                 }
             }
-            if(rights.ShowAppliancesToolStripMenuItem)
+            if(ActiveUser.Instance.Rights.ShowAppliancesToolStripMenuItem)
             {
                 ToolStripMenuItem appliancesToolStripMenuItem = new ToolStripMenuItem
                 {
@@ -176,7 +175,7 @@ namespace WindowsFormsApp1
                 appliancesToolStripMenuItem.Click += new System.EventHandler(this.ApplianceToolStripMenuItem_Click);
                 this.menuStrip.Items.Add(appliancesToolStripMenuItem);
             }
-            if(rights.ShowShopinglistToolStripMenuItem)
+            if(ActiveUser.Instance.Rights.ShowShopinglistToolStripMenuItem)
             {
                 ToolStripMenuItem shopinglistToolStripMenuItem = new ToolStripMenuItem
                 {
@@ -187,7 +186,7 @@ namespace WindowsFormsApp1
                 shopinglistToolStripMenuItem.Click += new System.EventHandler(this.ShopingListToolStripMenuItem_Click);
                 this.menuStrip.Items.Add(shopinglistToolStripMenuItem);
             }
-            if(rights.ShowChangeProfileToolStripMenuItem)
+            if(ActiveUser.Instance.Rights.ShowChangeProfileToolStripMenuItem)
             {
                 ToolStripMenuItem changeProfileToolStripMenuItem = new ToolStripMenuItem
                 {
@@ -198,7 +197,7 @@ namespace WindowsFormsApp1
                 changeProfileToolStripMenuItem.Click += new System.EventHandler(this.ChangeProfileStripMenuItem_Click);
                 this.menuStrip.Items.Add(changeProfileToolStripMenuItem);
             }
-            if(rights.ShowLogOutToolStripMenuItem)
+            if(ActiveUser.Instance.Rights.ShowLogOutToolStripMenuItem)
             {
                 ToolStripMenuItem logOutToolStripMenuItem = new ToolStripMenuItem
                 {
@@ -209,7 +208,7 @@ namespace WindowsFormsApp1
                 logOutToolStripMenuItem.Click += new System.EventHandler(this.LogOutToolStripMenuItem_Click);
                 this.menuStrip.Items.Add(logOutToolStripMenuItem);
             }
-            if(rights.ShowLogInToolStripMenuItem)
+            if(ActiveUser.Instance.Rights.ShowLogInToolStripMenuItem)
             {
                 ToolStripMenuItem logInToolStripMenuItem = new ToolStripMenuItem
                 {
@@ -220,7 +219,7 @@ namespace WindowsFormsApp1
                 logInToolStripMenuItem.Click += new System.EventHandler(this.LogInToolStripMenuItem_Click);
                 this.menuStrip.Items.Add(logInToolStripMenuItem);
             }
-            if(rights.ShowRegisterToolStripMenuItem)
+            if(ActiveUser.Instance.Rights.ShowRegisterToolStripMenuItem)
             {
                 ToolStripMenuItem registerToolStripMenuItem = new ToolStripMenuItem
                 {
@@ -268,7 +267,10 @@ namespace WindowsFormsApp1
         }
         private void GetFinancialInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            UI.FinanciaInfo financiaInfo = new UI.FinanciaInfo();
+            this.Visible = false;
+            financiaInfo.ShowDialog(this);
+            this.Visible = true;
         }
         private void SeeUserListToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -328,6 +330,7 @@ namespace WindowsFormsApp1
             {
                 RoleName = "guest"
             };
+            user.Rights = new DB.Rights(user.RoleName);
             Table = new ApplianceTable();
             ActiveUser.Instance.User = user;
             InitializeByRole();
@@ -356,9 +359,9 @@ namespace WindowsFormsApp1
         }
         private void TableView_RowHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (ActiveUser.Instance.Role == "guest") return;
+            if (!ActiveUser.Instance.Rights.ActiveTableRowHeader) return;
             int index = Convert.ToInt32(TableView["Hiden column", e.RowIndex].Value);
-            Table.Repository.Do(index);
+            Table.Repository.TableRowClicked(index);
             InitializeForm();
         }
         private void nextButton_Click(object sender, EventArgs e)
@@ -381,7 +384,7 @@ namespace WindowsFormsApp1
             this.Visible = true;
             if (!getCard.Aprove)
                 return;
-            Table.Repository.Do2();
+            Table.Repository.ActionButtonClick();
             InitializeForm();
         }
     }

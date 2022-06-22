@@ -52,7 +52,7 @@ namespace WindowsFormsApp1.DB
             }
             return result;
         }
-        public void Do(int row)
+        public void TableRowClicked(int row)
         {
             if(!Users[row].Enabled)
             {
@@ -81,7 +81,7 @@ namespace WindowsFormsApp1.DB
             var data = DB.Instance.Select(sql);
             return Convert.ToInt32(data["size"][0]);
         }
-        public void Do2()
+        public void ActionButtonClick()
         {
             throw new NotImplementedException();
         }

@@ -10,8 +10,8 @@ namespace WindowsFormsApp1.DB
     {
         void Load(string aditionalRequest, string orderBy = "", int page = 0);
         List<List<object>> FormTable();
-        void Do(int row);
-        void Do2();
+        void TableRowClicked(int row);
+        void ActionButtonClick();
         int GetSize(string aditionalRequest);
     }
 }

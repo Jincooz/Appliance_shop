@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,6 +74,7 @@ namespace WindowsFormsApp1.DB
             }
             return result;
         }
+        
         private bool IsInDB(string statement)
         {
             connection.Open();
@@ -103,7 +105,6 @@ namespace WindowsFormsApp1.DB
                 Connection = connection,
                 CommandText = statement
             };
-            //cmd.CommandType = System.Data.CommandType.StoredProcedure;
             try
             {
                 cmd.ExecuteNonQuery();
@@ -142,7 +143,7 @@ namespace WindowsFormsApp1.DB
         {
             string sql = "SELECT id FROM CHART_OF_ACCOUNTS";
             var result = Select(sql);
-            return ("Account", result["name"]);
+            return ("Account", result["id"]);
         }
         public Dictionary<string, List<Object>> SelectShopingList(string selectingItems)
         {
@@ -263,6 +264,12 @@ namespace WindowsFormsApp1.DB
             var result = Select(sql);
             return Convert.ToInt32(result["amount"][0]);
         }
+        public object GetRoleRights(string role_name)
+        {
+            string sql = $"SELECT right_name FROM role_rights_list WHERE role_name = '{role_name}'";
+            var result = Select(sql);
+            return result["right_name"];
+        }
         public void BuyTransaction(int user_id, double sum)
         {
             string sql =    $"START TRANSACTION;" +
@@ -283,6 +290,70 @@ namespace WindowsFormsApp1.DB
                             $"CALL CLOSE_SUPPLY_ORDER('{user_id}');" +
                             $"COMMIT;";
             DB.Instance.Procedure(sql);
+        }
+        public double GetCreditInfo(int id)
+        {
+            connection.Open();
+            double result = 0;
+            MySqlCommand cmd = new MySqlCommand
+            {
+                Connection = connection,
+                CommandText = "CALC_CREDIT"
+            };
+            try
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@chart_id", MySqlDbType.VarChar).Value = id.ToString();
+                MySqlParameter resultParam = new MySqlParameter("@Result", MySqlDbType.Decimal);
+                resultParam.Direction = ParameterDirection.ReturnValue;
+                cmd.Parameters.Add(resultParam);
+                cmd.ExecuteNonQuery();
+                if (resultParam.Value != DBNull.Value)
+                {
+                    result = Convert.ToDouble(resultParam.Value);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return result;
+        }
+        public double GetDebitInfo(int id)
+        {
+            connection.Open();
+            double result = 0;
+            MySqlCommand cmd = new MySqlCommand
+            {
+                Connection = connection,
+                CommandText = "CALC_DEBIT"
+            };
+            try
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@chart_id", MySqlDbType.VarChar).Value = id.ToString();
+                MySqlParameter resultParam = new MySqlParameter("@Result", MySqlDbType.Decimal);
+                resultParam.Direction = ParameterDirection.ReturnValue;
+                cmd.Parameters.Add(resultParam);
+                cmd.ExecuteNonQuery();
+                if (resultParam.Value != DBNull.Value)
+                {
+                    result = Convert.ToDouble(resultParam.Value);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return result;
         }
     }
 }
