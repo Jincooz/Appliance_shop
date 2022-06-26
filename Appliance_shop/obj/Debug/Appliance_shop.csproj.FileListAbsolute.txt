@@ -60,3 +60,4 @@ C:\Users\Jincooz\Desktop\Appliance_shop\Appliance_shop\obj\Debug\WindowsFormsApp
 C:\Users\Jincooz\Desktop\Appliance_shop\Appliance_shop\obj\Debug\WindowsFormsApp1.UI.AddCategory.resources
 C:\Users\Jincooz\Desktop\Appliance_shop\Appliance_shop\obj\Debug\WindowsFormsApp1.UI.AddTrademark.resources
 C:\Users\Jincooz\Desktop\Appliance_shop\Appliance_shop\obj\Debug\WindowsFormsApp1.UI.FinanciaInfo.resources
+C:\Users\Jincooz\Desktop\Appliance_shop\Appliance_shop\obj\Debug\Appliance_shop.csproj.SuggestedBindingRedirects.cache

@@ -21,7 +21,7 @@ namespace WindowsFormsApp1
         public Appliances()
         {
             InitializeComponent();
-            Table = new ApplianceTable();
+            ApplianceToolStripMenuItem_Click(this, new EventArgs());
             InitializeForm();
             InitializeByRole();
         }
@@ -256,8 +256,8 @@ namespace WindowsFormsApp1
         private void ApplianceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Table = new ApplianceTable();
-            InitializeForm();
             approvalButton.Visible = false;
+            InitializeForm();
             pagePanel.Visible = true;
             for (int i = 0; i < TableView.Columns.Count; i++)
             {
@@ -289,7 +289,7 @@ namespace WindowsFormsApp1
             UI.SupplyOrder supplyOrder = new UI.SupplyOrder();
             this.Visible = false;
             supplyOrder.ShowDialog(this);
-            Table = new ApplianceTable();
+            ApplianceToolStripMenuItem_Click(this,new EventArgs());
             InitializeByRole();
             InitializeForm();
             this.Visible = true;
@@ -299,7 +299,7 @@ namespace WindowsFormsApp1
             UI.Log_in logIn = new UI.Log_in();
             this.Visible = false;
             logIn.ShowDialog(this);
-            Table = new ApplianceTable();
+            ApplianceToolStripMenuItem_Click(this, new EventArgs());
             InitializeByRole();
             InitializeForm();
             this.Visible = true;
@@ -309,7 +309,7 @@ namespace WindowsFormsApp1
             UI.Registration registration = new UI.Registration();
             this.Visible = false;
             registration.ShowDialog(this);
-            Table = new ApplianceTable();
+            ApplianceToolStripMenuItem_Click(this, new EventArgs());
             InitializeByRole();
             InitializeForm();
             this.Visible = true;
@@ -319,7 +319,7 @@ namespace WindowsFormsApp1
             UI.ChangeProfile changeProfile = new UI.ChangeProfile();
             this.Visible = false;
             changeProfile.ShowDialog(this);
-            Table = new ApplianceTable();
+            ApplianceToolStripMenuItem_Click(this, new EventArgs());
             InitializeForm();
             this.Visible = true;
 
@@ -331,7 +331,7 @@ namespace WindowsFormsApp1
                 RoleName = "guest"
             };
             user.Rights = new DB.Rights(user.RoleName);
-            Table = new ApplianceTable();
+            ApplianceToolStripMenuItem_Click(this, new EventArgs());
             ActiveUser.Instance.User = user;
             InitializeByRole();
             InitializeForm();
