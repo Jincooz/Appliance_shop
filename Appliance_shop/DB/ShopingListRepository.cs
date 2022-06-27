@@ -13,35 +13,7 @@ namespace WindowsFormsApp1.DB
         public int Size { get => _appliances.Count; }
         public void Load(string aditionalRequest, string orderBy = "", int page = 0)
         {
-            Appliances = new List<ApplianceAmount>();
-            var data = DB.Instance.SelectShopingList("appliance_EAN AS EAN, amount");
-            foreach (var keyValuesPair in data)
-            {
-                (string key, object value) keyValuePair;
-                for (int i = 0; i < keyValuesPair.Value.Count; i++)
-                {
-                    if (i == Appliances.Count)
-                        Appliances.Add(new ApplianceAmount(new Appliance(), 0));
-                    keyValuePair = (keyValuesPair.Key, keyValuesPair.Value[i]);
-                    switch ((string)keyValuePair.key)
-                    {
-                        case "EAN":
-                            {
-                                Appliances[i].appliance.EAN = (string)keyValuePair.value;
-                                Appliances[i].appliance.LoadByEAN();
-                                break;
-                            }
-                        case "amount":
-                            {
-                                int amountOfAppliances = Convert.ToInt32(keyValuePair.value);
-                                var AppliaRef = Appliances[i]; 
-                                AppliaRef.amount = amountOfAppliances;
-                                Appliances[i] = AppliaRef;
-                                break;
-                            }
-                    }
-                }
-            }
+            Appliances = DB.Instance.SelectShopingList();
         }
         private List<object> FormTableColumnsName()
         {
@@ -113,9 +85,8 @@ namespace WindowsFormsApp1.DB
             Appliances.Add(new ApplianceAmount(new_appliance, 1));
         }
         public int GetSize(string aditionalRequest)
-        {            
-            var data = DB.Instance.SelectShopingList(" count(*) AS size ");
-            return Convert.ToInt32(data["size"][0]);
+        {
+            return DB.Instance.GetAmountOfShopingElements();
         }
         public void ActionButtonClick()
         {

@@ -48,7 +48,7 @@ namespace WindowsFormsApp1.UI
                 creditSum = creditSum - debitSum;
                 debitSum = 0;
             }
-            dataGridView1.Rows.Add("sum", debitSum.ToString(), creditSum.ToString());
+            dataGridView1.Rows.Add("sum", Math.Round(debitSum,2).ToString(), Math.Round(creditSum,2).ToString());
         }
     }
 }

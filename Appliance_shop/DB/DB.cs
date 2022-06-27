@@ -120,6 +120,16 @@ namespace WindowsFormsApp1.DB
                 connection.Close();
             }
         }
+        public Dictionary<string, List<Object>> SelectAvaliableDevices(string selectingItems, string aditionalRequest)
+        {
+            string sql = $"SELECT {selectingItems} FROM avaliable_devices_full WHERE amount > 0 " + aditionalRequest;
+            return DB.Instance.Select(sql);
+        }
+        public Dictionary<string, List<Object>> SelectAvaliableDevice(string selectingItems, string EAN)
+        {
+            string sql = $"SELECT {selectingItems} FROM avaliable_devices WHERE EAN = {EAN}";
+            return DB.Instance.Select(sql);
+        }
         public (string, List<object>) GetEnumerableTrademark()
         {
             string sql = "SELECT name FROM TRADEMARK";
@@ -144,20 +154,39 @@ namespace WindowsFormsApp1.DB
             var result = Select(sql);
             return ("Account", result["id"]);
         }
-        public Dictionary<string, List<Object>> SelectShopingList(string selectingItems)
+        public List<ApplianceAmount> SelectShopingList()
         {
-            string sql = $"SELECT {selectingItems} FROM shoping_list WHERE user_id = \"" + ActiveUser.Instance.ID + "\"";
-            return DB.Instance.Select(sql);
-        }
-        public Dictionary<string, List<Object>> SelectAvaliableDevices(string selectingItems, string aditionalRequest)
-        {
-            string sql = $"SELECT {selectingItems} FROM avaliable_devices_full WHERE amount > 0 " + aditionalRequest;
-            return DB.Instance.Select(sql);
-        }
-        public Dictionary<string, List<Object>> SelectAvaliableDevice(string selectingItems, string EAN)
-        {
-            string sql = $"SELECT {selectingItems} FROM avaliable_devices WHERE EAN = {EAN}";
-            return DB.Instance.Select(sql);
+            List<ApplianceAmount> appliances = new List<ApplianceAmount>();
+            string sql = $"SELECT appliance_EAN AS EAN, amount FROM shoping_list WHERE user_id = \"" + ActiveUser.Instance.ID + "\"";
+            var data = DB.Instance.Select(sql);
+            foreach (var keyValuesPair in data)
+            {
+                (string key, object value) keyValuePair;
+                for (int i = 0; i < keyValuesPair.Value.Count; i++)
+                {
+                    if (i == appliances.Count)
+                        appliances.Add(new ApplianceAmount(new Appliance(), 0));
+                    keyValuePair = (keyValuesPair.Key, keyValuesPair.Value[i]);
+                    switch ((string)keyValuePair.key)
+                    {
+                        case "EAN":
+                            {
+                                appliances[i].appliance.EAN = (string)keyValuePair.value;
+                                appliances[i].appliance.LoadByEAN();
+                                break;
+                            }
+                        case "amount":
+                            {
+                                int amountOfAppliances = Convert.ToInt32(keyValuePair.value);
+                                var AppliaRef = appliances[i];
+                                AppliaRef.amount = amountOfAppliances;
+                                appliances[i] = AppliaRef;
+                                break;
+                            }
+                    }
+                }
+            }
+            return appliances;
         }
         public bool TrademarkIsInDB(string trademark)
         {
@@ -260,6 +289,12 @@ namespace WindowsFormsApp1.DB
         public int GetAmountOfRequests(string name)
         {
             string sql = "SELECT count(*) AS amount FROM " + name;
+            var result = Select(sql);
+            return Convert.ToInt32(result["amount"][0]);
+        }
+        public int GetAmountOfShopingElements()
+        {
+            string sql = "SELECT count(*) AS amount FROM shoping_list WHERE user_id = \"" + ActiveUser.Instance.ID + "\"";
             var result = Select(sql);
             return Convert.ToInt32(result["amount"][0]);
         }
