@@ -18,11 +18,9 @@ namespace WindowsFormsApp1.UI
         }
         private void logInButton_Click(object sender, EventArgs e)
         {
-            DB.User user = new DB.User();
             try
             {
-                user.LogIn(loginTextBox.Text, passwordTextBox.Text);
-                ActiveUser.Instance.User = user;
+                ActiveUser.Instance.LogIn(loginTextBox.Text, passwordTextBox.Text);
                 this.Close();
             }
             catch (Exception exept)

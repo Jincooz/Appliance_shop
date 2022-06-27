@@ -164,100 +164,17 @@ namespace WindowsFormsApp1.DB
             string sql = "SELECT " + variables + " FROM users WHERE login = \"" + Login + "\"";
             return sql;
         }
-        private void LoadAllByLogin()
+        public void LoadAllByLogin()
         {
             LoadByLogin("id, email, hashed_password, Enabled, phone_number, creation_time, last_active_time, Role");
         }
-        private void LoadByLogin(string variables)
+        public void LoadByLogin(string variables)
         {
             var data = DB.Instance.Select(FormSql(variables));
             foreach (var keyValuePair in data)
             {
                 Add((keyValuePair.Key, keyValuePair.Value[0]));
             }
-        }
-        public void CheckPassword(string password)
-        {
-            byte[] hashBytes = Convert.FromBase64String(HashedPassword);
-            byte[] salt = new byte[16];
-            Array.Copy(hashBytes, 0, salt, 0, 16);
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
-            byte[] hash = pbkdf2.GetBytes(20);
-            for (int i = 0; i < 20; i++)
-                if (hashBytes[i + 16] != hash[i])
-                    throw new UnauthorizedAccessException();
-        }
-        private void UpdateLastSeen(int id)
-        {
-            DB.Instance.UpdateLastSeen(id);
-        }
-        public void Register(string login, string email, string phoneNumber, string roleName,
-                       DateTime dateTime, string password)
-        {
-            Login = login;
-            Email = email;
-            PhoneNumber = phoneNumber;
-            RoleName = roleName;
-            LastLogIn = dateTime;
-            byte[] salt;
-            new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
-            byte[] hash = pbkdf2.GetBytes(20);
-            byte[] hashBytes = new byte[36];
-            Array.Copy(salt, 0, hashBytes, 0, 16);
-            Array.Copy(hash, 0, hashBytes, 16, 20);
-            HashedPassword = Convert.ToBase64String(hashBytes);
-            DB.Instance.AddUser(login:Login,
-                                email:Email,
-                                phoneNumber:PhoneNumber,
-                                roleName:RoleName,
-                                hashedPassword:HashedPassword);
-            LoadByLogin("id");
-            ShopingList = new ShopingListRepository();
-            try
-            {
-                ShopingList.Load("");
-            }
-            catch (Exception e)
-            {
-                var a = e.Message;
-            }
-            Rights = new Rights(RoleName);
-        }
-        public void LogIn(string login, string password)
-        {
-            Login = login;
-            LoadAllByLogin();
-            if (!Enabled)
-                throw new Exception("You are banned");
-            CheckPassword(password);
-            UpdateLastSeen(Id);
-            ShopingList = new ShopingListRepository();
-            ShopingList.Load("");
-            Rights = new Rights(RoleName);
-        }
-        public void UpdateUser(string login, string email, string phoneNumber)
-        {
-            DB.Instance.UpdateUserData(Id, login, email, phoneNumber);
-            Login = login;
-            Email = email;
-            PhoneNumber = phoneNumber;
-        }
-        public void RestorePassword(string login, string email, string phoneNumber, string password)
-        {
-            Login = login;
-            LoadAllByLogin();
-            if (Email != email || PhoneNumber != phoneNumber)
-                throw new Exception();
-            byte[] salt;
-            new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
-            byte[] hash = pbkdf2.GetBytes(20);
-            byte[] hashBytes = new byte[36];
-            Array.Copy(salt, 0, hashBytes, 0, 16);
-            Array.Copy(hash, 0, hashBytes, 16, 20);
-            HashedPassword = Convert.ToBase64String(hashBytes);
-            DB.Instance.UpdatePassword(Id, HashedPassword);
         }
     }
 }

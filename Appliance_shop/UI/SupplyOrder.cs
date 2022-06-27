@@ -164,7 +164,7 @@ namespace WindowsFormsApp1.UI
                 };
                 try
                 {
-                    DB.DB.Instance.AddAppliacne(appliance.EAN, appliance.Title, appliance.Price, appliance.Category, appliance.Trademark, appliance.GuarantyTime);
+                    DB.DB.Instance.AddAppliacne(appliance);
                     HideAddNew();
                     Data.Appliances.Add(new DB.ApplianceAmount(appliance, Convert.ToInt32(AmountTextBox.Text)));
                     EANMaskedTextBox.ReadOnly = false;

@@ -115,10 +115,18 @@ namespace WindowsFormsApp1.DB
                 );
             if (result == DialogResult.Yes)
             {
-                ActiveUser.Instance.User.ShopingList.Do(Appliances[row].appliance);
-                var AplAmountRef = Appliances[row];
-                AplAmountRef.amount -= 1;
-                Appliances[row] = AplAmountRef;
+                try
+                {
+                    ActiveUser.Instance.User.ShopingList.Do(Appliances[row].appliance);
+                    var AplAmountRef = Appliances[row];
+                    AplAmountRef.amount -= 1;
+                    Appliances[row] = AplAmountRef;
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error",
+                         MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
         public int GetSize(string aditionalRequest)

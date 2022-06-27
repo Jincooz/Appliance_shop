@@ -21,19 +21,17 @@ namespace WindowsFormsApp1.DB
         public bool ShowSeeUserListToolStripMenuItem { get => GetRight("viewusers"); }
         public bool ShowAddSuplyToolStripMenuItem { get => GetRight("addsuply"); }
         public bool ActiveTableRowHeader { get => GetRight("clickrowheader"); }
-        public Rights(string roleName)
+        public Rights()
         {
-            GetRoleRights(roleName);
+            _rights = new Dictionary<string, bool>();
         }
         private void Add()
         {
             return;
         }
-        public void GetRoleRights(string role)
+        public void SetRoleRights(List<object> data)
         {
-            _rights = new Dictionary<string, bool>();
-            var data = DB.Instance.GetRoleRights(role);
-            foreach (object right in (List<object>)data)
+            foreach (object right in data)
             {
                 _rights[(string)right] = true;
             }
@@ -43,7 +41,7 @@ namespace WindowsFormsApp1.DB
         {
             if (_rights.Keys.Contains(title))
             {
-                return true;
+                return _rights[title];
             }
             else
             {

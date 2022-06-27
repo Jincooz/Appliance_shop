@@ -22,12 +22,10 @@ namespace WindowsFormsApp1.UI
         {
             if (CheckInput())
             {
-                DB.User user = new DB.User();
                 try
                 {
-                    user.Register(loginTextBox.Text, emailTextBox.Text, phoneNumberMaskedTextBox.Text, "user",
+                    ActiveUser.Instance.Register(loginTextBox.Text, emailTextBox.Text, phoneNumberMaskedTextBox.Text, "user",
                        DateTime.Now, passwordTextBox.Text);
-                    ActiveUser.Instance.User = user;
                     this.Close();
                 }
                 catch (Exception expt)

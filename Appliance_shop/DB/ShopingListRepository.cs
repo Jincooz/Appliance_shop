@@ -125,6 +125,7 @@ namespace WindowsFormsApp1.DB
                 sum += appliaceAmount.amount * appliaceAmount.appliance.Price;
             }
             DB.Instance.BuyTransaction(ActiveUser.Instance.ID, Math.Round(sum,2));
+            _appliances.Clear();
         }
     }
 }

@@ -74,7 +74,6 @@ namespace WindowsFormsApp1.DB
             }
             return result;
         }
-        
         private bool IsInDB(string statement)
         {
             connection.Open();
@@ -152,7 +151,7 @@ namespace WindowsFormsApp1.DB
         }
         public Dictionary<string, List<Object>> SelectAvaliableDevices(string selectingItems, string aditionalRequest)
         {
-            string sql = $"SELECT {selectingItems} FROM avaliable_devices_full " + aditionalRequest;
+            string sql = $"SELECT {selectingItems} FROM avaliable_devices_full WHERE amount > 0 " + aditionalRequest;
             return DB.Instance.Select(sql);
         }
         public Dictionary<string, List<Object>> SelectAvaliableDevice(string selectingItems, string EAN)
@@ -180,19 +179,19 @@ namespace WindowsFormsApp1.DB
             string sql = $"CALL UPDATE_LAST_SEEN({id})";
             DB.Instance.Procedure(sql);
         }
-        public void AddUser(string login, string email, string phoneNumber, string roleName, string hashedPassword)
+        public void AddUser(User user)
         {
-            string sql = $"CALL ADD_USER('{login}','{email}','{hashedPassword}','{phoneNumber}','{roleName}');";
+            string sql = $"CALL ADD_USER('{user.Login}','{user.Email}','{user.HashedPassword}','{user.PhoneNumber}','{user.RoleName}');";
             DB.Instance.Procedure(sql);
         }
-        public void UpdateUserData(int id, string login, string email, string phoneNumber)
+        public void UpdateUserData(User user)
         {
-            string sql = $"CALL UPDATE_USER_DATA('{id}','{login}','{email}','{phoneNumber}');";
+            string sql = $"CALL UPDATE_USER_DATA('{user.Id}','{user.Login}','{user.Email}','{user.PhoneNumber}');";
             DB.Instance.Procedure(sql);
         }
-        public void UpdateUserRole(int id, string role_name)
+        public void UpdateUserRole(int id, string roleName)
         {
-            string sql = $"CALL UPDATE_USER_ROLE('{id}','{role_name}');";
+            string sql = $"CALL UPDATE_USER_ROLE('{id}','{roleName}');";
             DB.Instance.Procedure(sql);
         }
         public void EnableUser(int id)
@@ -210,9 +209,9 @@ namespace WindowsFormsApp1.DB
             string sql = $"CALL UPDATE_PASSWORD('{newHashedPassword}','{id}');";
             DB.Instance.Procedure(sql);
         }
-        public void AddAppliacne(string EAN, string name, double price, string categoryName, string trademarkName, int guarantyDays)
+        public void AddAppliacne(Appliance appliance)
         {
-            string sql = $"CALL ADD_APPLIANCE('{EAN}','{name}','{price}','{categoryName}','{trademarkName}','{guarantyDays}');";
+            string sql = $"CALL ADD_APPLIANCE('{appliance.EAN}','{appliance.Title}','{appliance.Price}','{appliance.Category}','{appliance.Trademark}','{appliance.GuarantyTime}');";
             DB.Instance.Procedure(sql);
         }
         public void AddCategory(string name)
@@ -263,12 +262,6 @@ namespace WindowsFormsApp1.DB
             string sql = "SELECT count(*) AS amount FROM " + name;
             var result = Select(sql);
             return Convert.ToInt32(result["amount"][0]);
-        }
-        public object GetRoleRights(string role_name)
-        {
-            string sql = $"SELECT right_name FROM role_rights_list WHERE role_name = '{role_name}'";
-            var result = Select(sql);
-            return result["right_name"];
         }
         public void BuyTransaction(int user_id, double sum)
         {
@@ -354,6 +347,14 @@ namespace WindowsFormsApp1.DB
                 connection.Close();
             }
             return result;
+        }
+        public Rights GetRoleRights(string role_name)
+        {
+            Rights rights = new Rights();
+            string sql = $"SELECT right_name FROM role_rights_list WHERE role_name = '{role_name}'";
+            var result = Select(sql);
+            rights.SetRoleRights((List<object>)result["right_name"]);
+            return rights;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace WindowsFormsApp1.UI
             {
                 try
                 {
-                    ActiveUser.Instance.User.UpdateUser(loginTextBox.Text, emailTextBox.Text, phoneNumberMaskedTextBox.Text);
+                    ActiveUser.Instance.UpdateUser(loginTextBox.Text, emailTextBox.Text, phoneNumberMaskedTextBox.Text);
                     this.Close();
                 }
                 catch (Exception expt)

@@ -330,7 +330,7 @@ namespace WindowsFormsApp1
             {
                 RoleName = "guest"
             };
-            user.Rights = new DB.Rights(user.RoleName);
+            user.Rights = DB.DB.Instance.GetRoleRights(user.RoleName);
             ApplianceToolStripMenuItem_Click(this, new EventArgs());
             ActiveUser.Instance.User = user;
             InitializeByRole();

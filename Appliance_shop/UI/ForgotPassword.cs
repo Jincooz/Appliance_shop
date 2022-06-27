@@ -24,7 +24,7 @@ namespace WindowsFormsApp1.UI
                 DB.User user = new DB.User();
                 try
                 {
-                    user.RestorePassword(login: loginTextBox.Text,
+                    ActiveUser.Instance.RestorePassword(login: loginTextBox.Text,
                                             email: emailTextBox.Text,
                                             phoneNumber: phoneNumberMaskedTextBox.Text,
                                             password: passwordTextBox.Text);

@@ -61,7 +61,7 @@ namespace WindowsFormsApp1
             }
             if (filterRequest != "") 
             {
-                filterRequest = filterRequest.Insert(0, " WHERE ");
+                filterRequest = filterRequest.Insert(0, " AND ");
                 filterRequest = filterRequest.Remove(filterRequest.Length - 4); 
             }
             return filterRequest;
@@ -86,7 +86,7 @@ namespace WindowsFormsApp1
     {
         public ShopingListTable() : base()
         {
-            Repository = new DB.ShopingListRepository();
+            Repository = ActiveUser.Instance.User.ShopingList;
         }
     }
     public class ApplianceTable : Table
